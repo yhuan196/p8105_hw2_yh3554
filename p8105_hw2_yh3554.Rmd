@@ -123,4 +123,55 @@ Professor.Trash Wheel includes amount of trash and debris collected in Canton ne
 The final data "p2_df3" contains all observations from Mr.Trash Wheel and Professor.Trash Wheel which has `r nrow(p2_df3)` rows and `r ncol(p2_df3)` variables. The key variables are the same as before along with extra columns that indicates whether the data is from Mr.Trash Wheel or Professor.Trash Wheel.
 
 
+# Problem 3
+
+Read and clean data "pols-month", "snp", and "unemployment". Breaking the mon/date into year, month, and day. Replace the month number/shortcut month to month name and remove day variable. Creat a new variable president that taking the values of dem and gop for the first data. Lastly taking the order by year and month.
+
+```{r, message = FALSE}
+p3_df1 <- read_csv("fivethirtyeight_datasets/pols-month.csv") %>%
+  janitor::clean_names() %>%
+  separate(mon, into = c("year", "month", "day")) %>%
+  mutate(year = as.integer(year), month = as.integer(month), president = ifelse(prez_gop == 0, "dem", "gop")) %>%
+  arrange(year, month) %>%
+  mutate(month = month.name[month]) %>%
+  select(-prez_dem, -prez_gop, -day)
+head(p3_df1)
+
+p3_df2 <- read_csv("fivethirtyeight_datasets/snp.csv") %>%
+  janitor::clean_names() %>%
+  separate(date, into = c("month", "day", "year")) %>%
+  mutate(year = as.integer(year), year = ifelse(year >= 50, year + 1900, year + 2000), 
+         month = as.integer(month)) %>%
+  arrange(year, month) %>%
+  mutate(month = month.name[month]) %>%
+  select(year, month, close) 
+head(p3_df2)
+
+p3_df3 <- read_csv("fivethirtyeight_datasets/unemployment.csv") %>%
+  janitor::clean_names() %>%
+  pivot_longer(jan:dec, names_to = "month", values_to = "unemployment") %>%
+  mutate(month = recode(month, "jan" = "January", "feb" = "February", 
+                        "mar" = "March", "apr" = "April", "may" = "May", 
+                        "jun" = "June", "jul" = "July", "aug" = "August", 
+                        "sep" = "September", "oct" = "October", "nov" = "November", 
+                        "dec" = "December"))
+head(p3_df3)
+```
+
+
+#### Join the datasets. 
+
+By merging "snp" into "pols", and merge "unemployment" into the result.
+
+```{r}
+p3_df4 <- left_join(p3_df1, p3_df2, by = c("year", "month"))
+head(p3_df4)
+
+final_data <- left_join(p3_df4, p3_df3, by = c("year", "month"))
+head(final_data)
+```
+
+#### Summary of these datasets
+
+
 
