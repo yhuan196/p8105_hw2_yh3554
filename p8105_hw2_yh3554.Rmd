@@ -92,16 +92,16 @@ p1_df %>% pivot_longer(route1:route11,
 Read and clean the data "Mr.Trash Wheel". Assign appropriate column name to each variables and exclude rows or columns that containing notes or non-data entries. 
 
 ```{r}
-p2_df1 <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = 1) %>%
+p2_df1 <- read_excel("Trash Wheel Collection Data.xlsx", sheet = 1) %>%
     janitor::clean_names() %>%
     filter(dumpster != "NA", dumpster != "Grand Total", ) %>%
-    select(-c(15, 16, 17)) %>%
-    mutate(sports_balls = as.integer(sports_balls))
+    select(-c(15, 16)) %>%
+    mutate(year = as.integer(year), sports_balls = as.integer(sports_balls))
 
-p2_df2 <- read_excel("Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = 2) %>%
+p2_df2 <- read_excel("Trash Wheel Collection Data.xlsx", sheet = 2) %>%
     janitor::clean_names() %>%
     filter(dumpster != "NA", dumpster != "Grand Total", ) %>%
-    mutate(dumpster = as.character(dumpster), sports_balls = as.integer(sports_balls))
+    mutate(year = as.integer(year))
 ```
 
 
@@ -118,9 +118,9 @@ p2_df3
 ```
 
 #### Summary of these data
-Mr.Trash Wheel includes amount of trash and debris collected in Inner Harbor in Baltimore from May 2014 to Jan 2021. The data has `r nrow(p2_df1)` rows and 14 variables. The key variables are date, weight in tons, volume in yards, types of trash, and estimate of homes powered by electricity from incinerated trash. Mr Trash Wheel collect total of `r p2_df1 %>% filter(year == 2020) %>% select(sports_balls) %>% sum()` sports balls in 2020.\
-Professor.Trash Wheel includes amount of trash and debris collected in Canton neighborhood in Baltimore from Jan 2017 to Jan 2021. The data has `r nrow(p2_df2)` rows and 14 variables. The key variables are same as previous data. Professor TraSH Wheel collect a total weight of trash `r sum(p2_df2$weight_tons)` tons.\
-The final data "p2_df3" contains all observations from Mr.Trash Wheel and Professor.Trash Wheel which has `r nrow(p2_df3)` rows and `r ncol(p2_df3)` variables. The key variables are the same as before along with extra columns that indicates whether the data is from Mr.Trash Wheel or Professor.Trash Wheel.
+Mr.Trash Wheel "p2_df1" includes amount of trash and debris collected in Inner Harbor in Baltimore from `r min(p2_df1$year)` to `r max(p2_df1$year)`. The data has `r nrow(p2_df1)` rows and `r ncol(p2_df1) - 1` variables. The key variables are date, weight in tons, volume in yards, types of trash, and estimate of homes powered by electricity from incinerated trash. Mr Trash Wheel collect total of `r p2_df1 %>% filter(year == 2020) %>% select(sports_balls) %>% sum()` sports balls in 2020.\
+Professor.Trash Wheel "p2_df2" includes amount of trash and debris collected in Canton neighborhood in Baltimore from `r min(p2_df2$year)` to `r max(p2_df2$year)`. The data has `r nrow(p2_df2)` rows and `r ncol(p2_df2) - 1` variables. The key variables are same as previous data. Professor TraSH Wheel collect a total weight of trash `r sum(p2_df2$weight_tons)` tons.\
+The merged data "p2_df3" contains all observations from Mr.Trash Wheel and Professor.Trash Wheel which has `r nrow(p2_df3)` rows and `r ncol(p2_df3)` variables. The key variables are the same as before along with extra columns that indicates whether the data is from Mr.Trash Wheel or Professor.Trash Wheel.
 
 
 # Problem 3
@@ -171,7 +171,20 @@ final_data <- left_join(p3_df4, p3_df3, by = c("year", "month"))
 head(final_data)
 ```
 
+
+#### Check the number of missing values
+```{r}
+sapply(final_data, function(close) sum(is.na(close)))
+```
+
+
 #### Summary of these datasets
+The pols_month "p3_df1" data frame includes the election results of two party (Grand Old Party and Democratic Party) from `r min(p3_df1$year)` to `r max(p3_df1$year)`. There are `r nrow(p3_df1)` observations and `r ncol(p3_df1)` variables. The variables are year, month, president party, and polls result of political party, House of Representative, and senators. \
+The snp "p3_df2" data frame contains the respective closing value of stock index from `r min(p3_df2$year)` to `r max(p3_df2$year)`. There are `r nrow(p3_df2)` observations and `r ncol(p3_df2)` variables. The variables are year, month, and closing value of stock index. \
+The unemployment "p3_df3" data frame contains the unemployment rate from `r min(p3_df3$year)` to `r max(p3_df3$year)`. It has `r nrow(p3_df3)` observations and `r ncol(p3_df3)` variables which are year, month, and unemployment rate.\
+The final_data dataset merge the three data frames into a single one. It has `r nrow(final_data)` observations and `r ncol(final_data)` variables. The variables are year, month, president party, polls result of political party, polls result House of Representative, polls result of senators, closing value of stock index, and unemployment rate. The range is from `r min(final_data$year)` to `r max(final_data$year)` with a total of `r max(final_data$year) - min(final_data$year)` years. There are 36 missing value of closing value and 12 missing value of president since the range of year are different in three data frames.
+
+
 
 
 
